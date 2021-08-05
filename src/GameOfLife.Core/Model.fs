@@ -5,4 +5,5 @@ type Cell =
     | Dead
 
 
-type Board = { Cells: Cell[,] }
+type Board(rows: int, columns: int) =
+    member this.cells = []
