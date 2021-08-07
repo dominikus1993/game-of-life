@@ -7,6 +7,13 @@ type Cell =
     | Alive of Coordinate
     | Dead of Coordinate
 
+
+module Coordinate = 
+    let isCorrect coor = 
+        match coor with 
+        | TwoDimensionalCoordinate (x, y) ->
+            x >= 0 && y >= 0
+
  module Cell =
     open System
 
