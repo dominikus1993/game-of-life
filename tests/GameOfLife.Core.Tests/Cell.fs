@@ -21,3 +21,17 @@ let ``Test alive when has x neighbour`` (alive: int, shouldBeDead: bool) =
     match subject with
     | Alive(_) -> Assert.True(shouldBeDead |> not)
     | Dead(_) -> Assert.True(shouldBeDead)
+
+
+[<Theory>]
+[<InlineData(1, false)>]
+[<InlineData(2, false)>]
+[<InlineData(3, true)>]
+[<InlineData(4, false)>]
+let ``Test dead when has x neighbour`` (alive: int, shouldBeAlive: bool) =
+    let neighours = crateCells (alive) (6) 
+    let cell = Dead(TwoDimensionalCoordinate(0, 0))
+    let subject = Cell.checkLiveness(cell)(neighours)
+    match subject with
+    | Alive(_) -> Assert.True(shouldBeAlive)
+    | Dead(_) -> Assert.True(shouldBeAlive |> not)
