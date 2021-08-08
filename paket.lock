@@ -3,6 +3,12 @@ RESTRICTION: == net50
 NUGET
   remote: https://api.nuget.org/v3/index.json
     coverlet.collector (3.1)
+    FSharp.Core (5.0.2)
+    FsUnit.xUnit (4.0.5)
+      FSharp.Core (>= 4.7.2)
+      NETStandard.Library (>= 2.0.3)
+      NHamcrest (>= 2.0.1 < 2.1)
+      xunit (>= 2.4.1 < 2.5)
     Microsoft.CodeCoverage (16.10)
     Microsoft.NET.Test.Sdk (16.10)
       Microsoft.CodeCoverage (>= 16.10)
@@ -17,6 +23,8 @@ NUGET
     NETStandard.Library (2.0.3)
       Microsoft.NETCore.Platforms (>= 1.1)
     Newtonsoft.Json (13.0.1)
+    NHamcrest (2.0.1)
+      NETStandard.Library (>= 1.6.1)
     NuGet.Frameworks (5.10)
     System.Reflection.Metadata (5.0)
     xunit (2.4.1)

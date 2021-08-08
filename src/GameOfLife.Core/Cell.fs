@@ -14,6 +14,17 @@ module Coordinate =
         | TwoDimensionalCoordinate (x, y) ->
             x >= 0 && y >= 0
 
+    let getNeighbours(coor: Coordinate) = 
+        match coor with
+        | TwoDimensionalCoordinate(x, y) ->
+            seq {
+                for i in x-1..x+1 do
+                    for j in y-1..y+1 do
+                        let coor = TwoDimensionalCoordinate(i, j);
+                        if (i<>x || j<>y) && isCorrect(coor) then                           
+                            yield coor
+            }
+
  module Cell =
     open System
 
