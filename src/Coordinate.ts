@@ -16,3 +16,16 @@ export function isCorrect(coor: Coordinate): boolean {
     }
     throw new Error("Not a 2d coordinate");
 }
+
+export function* getNeighbours(coor: Coordinate) {
+    if(isTwoDimensionalCoordinate(coor)) {
+        const { x, y } = coor;
+        for(let i = x - 1; i <= x + 1; i++) {
+            for(let j = y - 1; j <= y + 1; j++) {
+                if((i !== x || j !== y) && isCorrect({ x: i, y: j })) {
+                    yield { x: i, y: j } as Coordinate;
+                }
+            }
+        }
+    }
+}

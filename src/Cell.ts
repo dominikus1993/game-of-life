@@ -1,6 +1,13 @@
+import { Coordinate } from "./Coordinate";
 
-export enum Cell {
-    Dead = 0,
-    Alive = 1
+export interface Cell {
+    Coordinate: Coordinate,
 }
 
+export interface DeadCell extends Cell {
+    
+}
+
+export interface AliveCell extends Cell {
+
+}
