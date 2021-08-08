@@ -1,15 +1,13 @@
 export interface Coordinate {
-    kind: string
 }
 
 export interface TwoDimensionalCoordinate extends Coordinate {
-    kind: "2d"
     readonly x: number;
     readonly y: number;
 }
 
 function isTwoDimensionalCoordinate(coor: Coordinate): coor is TwoDimensionalCoordinate {
-    return coor.kind === "2d";
+    return "x" in coor && "y" in coor;
 }
 
 export function isCorrect(coor: Coordinate): boolean {
