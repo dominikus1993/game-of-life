@@ -6,7 +6,7 @@ export interface TwoDimensionalCoordinate extends Coordinate {
     readonly y: number;
 }
 
-function isTwoDimensionalCoordinate(coor: Coordinate): coor is TwoDimensionalCoordinate {
+export function isTwoDimensionalCoordinate(coor: Coordinate): coor is TwoDimensionalCoordinate {
     return "x" in coor && "y" in coor;
 }
 

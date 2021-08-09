@@ -17,5 +17,8 @@ test('test get neighbours for 2d point', () => {
     const coor = { x: 0, y: 0 };
     const subject = [...getNeighbours(coor)];
     expect(subject.length).toBe(3);
+    expect(subject).toContainEqual({ x: 0, y: 1 });
+    expect(subject).toContainEqual({ x: 1, y: 1 });
+    expect(subject).toContainEqual({ x: 1, y: 0 });
 });
 
