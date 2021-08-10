@@ -1,5 +1,5 @@
 import { Cell, createRandom } from "./Cell";
-import { Coordinate, getNeighbours, isTwoDimensionalCoordinate, TwoDimensionalCoordinate } from "./Coordinate";
+import { Coordinate, getNeighbours, isTwoDimensionalCoordinate } from "./Coordinate";
 
 type Size = { rows: number; columns: number };
 

@@ -1,17 +1,35 @@
-import React, { useEffect, useState } from "react";
-import logo from './logo.svg';
+import React, { useState } from "react";
 import './App.css';
 import { Board } from "./Board";
 import { Cell, isAlive } from "./Cell";
 
+function CellRow(props: { rowId: number; row: Cell[] }) {
+    const cells = props.row.map((cell, index) => {
+        const key = `${props.rowId}-${index}`;
+        return (<td color="red" key={key}>{isAlive(cell) ? "A" : "D"}</td>)
+    })
+    return (
+        <tr key={props.rowId}>
+            {cells}
+        </tr>
+    )
+}
+
+function CellsComponent(props: { cells: Cell[][] }) {
+    const rows = props.cells.map((row, index) => <CellRow rowId={index} row={row} />)
+    return (<table width="100%">
+        <tbody>
+            {rows}
+        </tbody>
+    </table>)
+}
 
 function Game() {
     const [count, setCount] = useState(0);
-    const [board, _] = useState(Board.create(10, 10));
+    const [board, _] = useState(Board.create(100, 100));
     return (
         <div className="App">
-            <h1>xD</h1>
-            <h2>{JSON.stringify(board.getCells())}</h2>
+            <CellsComponent cells={board.getCells()} />
         </div>
     );
 }
