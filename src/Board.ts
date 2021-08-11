@@ -21,60 +21,46 @@ function memonize<TParam, TRes>() {
     };
 }
 
-export class Board {
-    #cells: Cell[][];
-    readonly #size: Size;
-    readonly #memonize;
-
-    private constructor(size: Size, cell: Cell[][]) {
-        this.#cells = cell;
-        this.#size = Object.freeze(size);
-        this.#memonize = memonize<Coordinate, Coordinate[]>();
+function getCell(board: Board, coor: Coordinate): Cell {
+    if (isTwoDimensionalCoordinate(coor)) {
+        const { x, y } = coor;
+        return board.Cells[y][x];
     }
+    throw new Error(`Coordinate ${coor} is not two dimensional`);
+}
 
-    private getCell(coor: Coordinate): Cell {
-        if (isTwoDimensionalCoordinate(coor)) {
-            const { x, y } = coor;
-            return this.#cells[y][x];
-        }
-        throw new Error(`Coordinate ${coor} is not two dimensional`);
-    }
+const memo = memonize<Coordinate, Coordinate[]>();
 
-    getCells(): Cell[][] {
-        return this.#cells;
-    }
+export interface Board { 
+    readonly Cells: Cell[][];
+    readonly Size: Size;
+}
 
-    getSize(): Size {
-        return this.#size;
-    }
-
-    next() {
-        const newCells = [];
-        for (const row of this.#cells) {
-            const newRow = [];
-            for (const column of row) {
-                const neighbours = this.#memonize(column.Coordinate, (coor) => [...getNeighbours(coor)].filter(x => isInSize(x, this.#size)));
-                if (Array.isArray(neighbours)) {
-                    const n = neighbours.map(coor => this.getCell(coor));
-                    newRow.push(column.checkState(n));
-                }
+export function createBoard(size: Size): Board {
+    function* generate(size: Size) {
+        for (let i = 0; i < size.rows; i++) {
+            const row = [];
+            for (let j = 0; j < size.columns; j++) {
+                row.push(createRandom({ x: j, y: i }));
             }
-            newCells.push(newRow);
+            yield row;
         }
-        this.#cells = newCells;
     }
+    return { Size: size, Cells: [...generate(size)]} ;
+}
 
-    static create(rows: number, columns: number): Board {
-        function* generate(size: Size) {
-            for (let i = 0; i < size.rows; i++) {
-                const row = [];
-                for (let j = 0; j < size.columns; j++) {
-                    row.push(createRandom({ x: j, y: i }));
-                }
-                yield row;
+export function next(board: Board): Board {
+    const newCells = [];
+    for (const row of board.Cells) {
+        const newRow = [];
+        for (const column of row) {
+            const neighbours = memo(column.Coordinate, (coor) => [...getNeighbours(coor)].filter(x => isInSize(x, board.Size)));
+            if (Array.isArray(neighbours)) {
+                const n = neighbours.map(coor => getCell(board, coor));
+                newRow.push(column.checkState(n));
             }
         }
-        const size: Size = { rows, columns };
-        return new Board(size, [...generate(size)]);
+        newCells.push(newRow);
     }
+    return { ...board, Cells: newCells };
 }
