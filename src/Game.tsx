@@ -33,13 +33,15 @@ function CellsComponent(props: { cells: Cell[][] }) {
 }
 
 function Game() {
-    const [board, setBoard] = useState(createBoard({ rows: 10, columns: 10 }));
+    const [board, setBoard] = useState(createBoard({ rows: 100, columns: 100 }));
     const [count, setCount] = useState(0);
-    const refCount = useRef(count);
-    setInterval(() => {
-        setCount(refCount.current + 1);
-        setBoard(next(board))
-    }, 1000)
+
+    useEffect(() => {
+        setInterval(() => {
+            setCount(c => c + 1);
+            setBoard(b => next(b))
+        }, 10)
+    },[board, count]);
 
     return (
         <div className="App">

@@ -1,4 +1,4 @@
-import { Cell, createRandom } from "./Cell";
+import { Cell, checkState, createRandom } from "./Cell";
 import { Coordinate, getNeighbours, isTwoDimensionalCoordinate } from "./Coordinate";
 
 type Size = { rows: number; columns: number };
@@ -53,11 +53,11 @@ export function next(board: Board): Board {
     const newCells = [];
     for (const row of board.Cells) {
         const newRow = [];
-        for (const column of row) {
-            const neighbours = memo(column.Coordinate, (coor) => [...getNeighbours(coor)].filter(x => isInSize(x, board.Size)));
+        for (const cell of row) {
+            const neighbours = memo(cell.Coordinate, (coor) => [...getNeighbours(coor)].filter(x => isInSize(x, board.Size)));
             if (Array.isArray(neighbours)) {
                 const n = neighbours.map(coor => getCell(board, coor));
-                newRow.push(column.checkState(n));
+                newRow.push(checkState(cell, n));
             }
         }
         newCells.push(newRow);
