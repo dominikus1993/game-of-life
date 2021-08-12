@@ -20,6 +20,20 @@ export function isAlive(cell: Cell): cell is AliveCell {
     return cell.kind === "Alive";
 }
 
+export function createAlive(coordinate: Coordinate): AliveCell {
+    return {
+        kind: "Alive",
+        Coordinate: coordinate,
+    };
+}
+
+export function createDead(coordinate: Coordinate): DeadCell {
+    return {
+        kind: "Dead",
+        Coordinate: coordinate,
+    };
+}
+
 export function checkState(cell: Cell, neighbours: Cell[]): Cell {
     const aliveCount = neighbours.filter((cell) => isAlive(cell)).length;
     if (isDead(cell)) {
