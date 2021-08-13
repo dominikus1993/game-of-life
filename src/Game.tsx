@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import './App.css';
-import { Board, createBoard, next } from "./Board";
+import { createBoard, next } from "./Board";
 import { Cell, isAlive } from "./Cell";
 
 function AliveCell(props: { cell: Cell, key: string }) {
@@ -33,7 +33,7 @@ function CellsComponent(props: { cells: Cell[][] }) {
 }
 
 function Game() {
-    const [board, setBoard] = useState(createBoard({ rows: 100, columns: 100 }));
+    const [board, setBoard] = useState(createBoard({ rows: 50, columns: 50 }));
     const [count, setCount] = useState(0);
 
     useEffect(() => {
