@@ -50,17 +50,17 @@ export function createBoard(size: Size): Board {
 }
 
 export function next(board: Board): Board {
-    const newCells = [];
-    for (const row of board.Cells) {
-        const newRow = [];
-        for (const cell of row) {
+    const newCells = Array.from(board.Cells);
+    for (const [i, row] of newCells.entries()) {
+        const newRow = Array.from(row);
+        for (const [j, cell] of newRow.entries()) {
             const neighbours = memo(cell.Coordinate, (coor) => [...getNeighbours(coor)].filter(x => isInSize(x, board.Size)));
             if (Array.isArray(neighbours)) {
                 const n = neighbours.map(coor => getCell(board, coor));
-                newRow.push(checkState(cell, n));
+                newRow[j] = checkState(cell, n);
             }
         }
-        newCells.push(newRow);
+        newCells[i] = newRow;
     }
     return { ...board, Cells: newCells };
 }
