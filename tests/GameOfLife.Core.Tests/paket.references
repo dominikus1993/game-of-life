@@ -1,0 +1,9 @@
+Akka.TestKit
+AutoFixture
+FluentAssertions
+xunit
+xunit.runner.visualstudio
+Moq
+coverlet.collector
+DotNet.Testcontainers
+Microsoft.NET.Test.Sdk

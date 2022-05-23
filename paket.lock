@@ -9,6 +9,8 @@ NUGET
       System.Configuration.ConfigurationManager (>= 4.7)
       System.Reflection.Emit (>= 4.7)
       System.Threading.Channels (>= 5.0)
+    Akka.TestKit (1.4.38)
+      Akka (>= 1.4.38)
     AsyncFixer (1.6)
     AutoFixture (4.17)
       Fare (>= 2.1.1 < 3.0)

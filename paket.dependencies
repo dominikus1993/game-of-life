@@ -37,6 +37,7 @@ nuget ClrHeapAllocationAnalyzer
 nuget EFCore.NamingConventions
 nuget Dapper
 
+nuget Akka.TestKit
 nuget AutoFixture
 nuget FluentAssertions
 nuget xunit
