@@ -1,3 +1,5 @@
+
 fn main() {
-    println!("Hello, world!");
+    let cell = 2;
+    println!("Hello, world! {}", cell);
 }
