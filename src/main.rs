@@ -1,5 +1,5 @@
+mod game;
 
 fn main() {
-    let cell = 2;
-    println!("Hello, world! {}", cell);
+    game::start();
 }
