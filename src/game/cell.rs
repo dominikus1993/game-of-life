@@ -1,4 +1,5 @@
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Coordinate {
     pub x: i32,
     pub y: i32
@@ -13,6 +14,8 @@ impl Coordinate {
     }
 }
 
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
     Alive(Coordinate),
     Dead(Coordinate)
