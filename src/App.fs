@@ -1,5 +1,6 @@
 module App
 
+open GameOfLife
 open Browser.Dom
 
 // Mutable variable to count the number of times we clicked the button
@@ -12,3 +13,5 @@ let myButton = document.querySelector(".my-button") :?> Browser.Types.HTMLButton
 myButton.onclick <- fun _ ->
     count <- count + 1
     myButton.innerText <- sprintf "You clicked: %i time(s)" count
+
+console.log(Alive |> Cell.name)
