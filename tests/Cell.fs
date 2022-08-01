@@ -1,12 +1,18 @@
-module Tests
+module CellTests
 
 open Fable.Mocha
+open GameOfLife
 
 let cell =
     testList "Cell tests" [
-        test "name works" {
-            Expect.equal (1 + 1) 2 "plus"
+        test "Dead name works" {
+            let cellName = Dead |> Cell.name
+            Expect.equal cellName "dead" "dead cell"
+        }
+        test "Alive name works" {
+            let cellName = Alive |> Cell.name
+            Expect.equal cellName "alive" "dead cell"
         }
     ]
 
-Mocha.runTests arithmeticTests
+Mocha.runTests cell |> ignore
