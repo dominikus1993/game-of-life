@@ -4,6 +4,7 @@ type Cell =
     | Alive
     | Dead 
 
+
 module Cell =
 
     let name cell = 
