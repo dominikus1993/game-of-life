@@ -1,7 +1,8 @@
 namespace GameOfLife
 
+
 [<Struct>]
-type Coordinates = { X: int; Y: int }
+type Coordinates = | TwoDimensionCoordinate of  x: int * y: int 
 
 [<Struct>]
 type Cell = 
@@ -26,10 +27,9 @@ module Cell =
         | cell -> cell 
 
 module Coordinates = 
+    let isValid (coor: Coordinates) = 
+        let (TwoDimensionCoordinate(x, y)) = coor
+        x >= 0 && y >= 0
+
     let isNeighbour coor1 coor2 =
         true
-    let getNeighbours (cell: Cell) (cells: seq<Cell>) =
-        let coors = match cell with Alive(coor) -> coor | Dead(coor) -> coor
-
-
-        2
