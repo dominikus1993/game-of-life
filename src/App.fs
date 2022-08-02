@@ -14,4 +14,4 @@ myButton.onclick <- fun _ ->
     count <- count + 1
     myButton.innerText <- sprintf "You clicked: %i time(s)" count
 
-console.log(Alive |> Cell.name)
+console.log(Alive({X = 2; Y = 2}) |> Cell.name)
