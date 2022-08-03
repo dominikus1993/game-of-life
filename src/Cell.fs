@@ -4,11 +4,13 @@ namespace GameOfLife
 [<Struct>]
 type Coordinates = | TwoDimensionCoordinate of  x: int * y: int 
 
-[<Struct>]
-type Cell = 
-    | Alive of coordinates1: Coordinates
-    | Dead of coordinates2: Coordinates
+type Cell =  
+    | Alive
+    | Dead
 
+
+module CellInfo = 
+    let create 
 
 module Cell =
 
@@ -17,7 +19,7 @@ module Cell =
         | Alive(_) -> "alive"
         | Dead(_) -> "dead"
 
-    let checkState neighbours cell =
+    let updateState neighbours cell =
         let aliveCount = neighbours |> Seq.filter(fun n -> match n with | Alive(_) -> true | _ -> false) |> Seq.length
         match cell with
         | Dead(coor) when aliveCount = 3 ->

@@ -17,28 +17,28 @@ let cell =
             let sampleCoord = TwoDimensionCoordinate(2, 3)
             let cell = Dead(sampleCoord)
             let neighbours = [Alive(sampleCoord); Alive(sampleCoord); Alive(sampleCoord);]
-            let subject = cell |> Cell.checkState(neighbours)
+            let subject = cell |> Cell.updateState(neighbours)
             Expect.equal subject (Alive(sampleCoord)) "dead cell"
         }
         test "Check state dead cell when new state should be a Dead"  {
             let sampleCoord = TwoDimensionCoordinate(2, 3);
             let cell = Dead(sampleCoord)
             let neighbours = [Alive(sampleCoord); Alive(sampleCoord); Alive(sampleCoord);Alive(sampleCoord)]
-            let subject = cell |> Cell.checkState(neighbours)
+            let subject = cell |> Cell.updateState(neighbours)
             Expect.equal subject (Dead(sampleCoord)) "dead cell"
         }
         test "Check state Alive cell when new state should be a Alive" {
             let sampleCoord = TwoDimensionCoordinate(2, 3)
             let cell = Alive(sampleCoord)
             let neighbours = [Alive(sampleCoord); Alive(sampleCoord); Alive(sampleCoord);]
-            let subject = cell |> Cell.checkState(neighbours)
+            let subject = cell |> Cell.updateState(neighbours)
             Expect.equal subject (Alive(sampleCoord)) "dead cell"
         }
         test "Check state dead cell when new state should be a Dead"  {
             let sampleCoord = TwoDimensionCoordinate(2, 3)
             let cell = Dead(sampleCoord)
             let neighbours = [Alive(sampleCoord); Alive(sampleCoord); Alive(sampleCoord);Alive(sampleCoord)]
-            let subject = cell |> Cell.checkState(neighbours)
+            let subject = cell |> Cell.updateState(neighbours)
             Expect.equal subject (Dead(sampleCoord)) "dead cell"
         }
     ]
