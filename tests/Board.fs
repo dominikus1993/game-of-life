@@ -48,7 +48,7 @@ let coordinatesInBoard =
         test "(x: 11, y: 0) is not in board" {
             let board = Board.newBoard 10 10
             let subject =  board |> Board.isInBoard(TwoDimensionCoordinate(11, 0))
-            Expect.isTrue subject "dead cell"
+            Expect.isFalse subject "dead cell"
         }
         test "(x: 0, y: 11) is not in board" {
             let board = Board.newBoard 10 10
