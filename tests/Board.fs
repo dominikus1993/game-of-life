@@ -28,38 +28,37 @@ let coordinates =
         }
     ]
 
+let coordinatesInBoard =
+    testList "Generate Coordinates tests" [
+        test "(x: 0, y: 0) is in board" {
+            let board = Board.newBoard 10 10
+            let subject =  board |> Board.isInBoard(TwoDimensionCoordinate(0, 0))
+            Expect.isTrue subject "dead cell"
+        }
+        test "(x: -1, y: 0) is not in board" {
+            let board = Board.newBoard 10 10
+            let subject =  board |> Board.isInBoard(TwoDimensionCoordinate(-1, 0))
+            Expect.isFalse subject "dead cell"
+        }
+        test "(x: 0, y: -1) is  not in board" {
+            let board = Board.newBoard 10 10
+            let subject =  board |> Board.isInBoard(TwoDimensionCoordinate(0, -1))
+            Expect.isFalse subject "dead cell"
+        }
+        test "(x: 11, y: 0) is not in board" {
+            let board = Board.newBoard 10 10
+            let subject =  board |> Board.isInBoard(TwoDimensionCoordinate(11, 0))
+            Expect.isTrue subject "dead cell"
+        }
+        test "(x: 0, y: 11) is not in board" {
+            let board = Board.newBoard 10 10
+            let subject =  board |> Board.isInBoard(TwoDimensionCoordinate(0, 11))
+            Expect.isFalse subject "dead cell"
+        }
+    ]
+
 let board =
     testList "Board tests" [
-        test "Dead name works" {
-            let cellName = Dead |> Cell.name
-            Expect.equal cellName "dead" "dead cell"
-        }
-        test "Alive name works" {
-            let cellName = Alive |> Cell.name
-            Expect.equal cellName "alive" "dead cell"
-        }
-        test "Check state dead cell when new state should be a Alive" {
-            let cell = Dead
-            let neighbours = [Alive; Alive; Alive;]
-            let subject = cell |> Cell.updateState(neighbours)
-            Expect.equal subject (Alive) "dead cell"
-        }
-        test "Check state dead cell when new state should be a Dead"  {
-            let cell = Dead
-            let neighbours = [Alive; Alive; Alive;Alive]
-            let subject = cell |> Cell.updateState(neighbours)
-            Expect.equal subject (Dead) "dead cell"
-        }
-        test "Check state Alive cell when new state should be a Alive" {
-            let cell = Alive
-            let neighbours = [Alive; Alive; Alive;]
-            let subject = cell |> Cell.updateState(neighbours)
-            Expect.equal subject (Alive) "dead cell"
-        }
-        test "Check state dead cell when new state should be a Dead"  {
-            let cell = Dead
-            let neighbours = [Alive; Alive; Alive;Alive]
-            let subject = cell |> Cell.updateState(neighbours)
-            Expect.equal subject (Dead) "dead cell"
-        }
+        coordinates
+        coordinatesInBoard
     ]
