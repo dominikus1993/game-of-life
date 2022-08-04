@@ -8,24 +8,20 @@ type Cell =
     | Alive
     | Dead
 
-
-module CellInfo = 
-    let create 
-
 module Cell =
 
     let name cell = 
         match cell with 
-        | Alive(_) -> "alive"
-        | Dead(_) -> "dead"
+        | Alive -> "alive"
+        | Dead -> "dead"
 
     let updateState neighbours cell =
         let aliveCount = neighbours |> Seq.filter(fun n -> match n with | Alive(_) -> true | _ -> false) |> Seq.length
         match cell with
-        | Dead(coor) when aliveCount = 3 ->
-            Alive(coor)
-        | Alive(coor) when not (aliveCount = 2 || aliveCount = 3) -> 
-            Dead(coor)
+        | Dead when aliveCount = 3 ->
+            Alive
+        | Alive when not (aliveCount = 2 || aliveCount = 3) -> 
+            Dead
         | cell -> cell 
 
 module Coordinates = 
