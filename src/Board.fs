@@ -22,7 +22,18 @@ module Board =
     let generateCoordinate index board = 
         let y = index / board.Width
         let x = index % board.Width
-        TwoDimensionCoordinate(x, y) 
+        TwoDimensionCoordinate(x, y)
+
+    let getIndexFromCoordinates coor board = 
+        let (TwoDimensionCoordinate(x, _)) = coor
+        let index = x * board.Width
+        index
         
-    let getNeighbours (cell: Cell) (cells: seq<Cell>) =
+        
+    let getNeighbours (cell: BoardCell) (board: Board) =
+        let ({ Coordinates = TwoDimensionCoordinate(x, y) }) =  cell
+        for i in [x-1..x+1] do 
+            for j in [y-1..y+1] do
+                //let isCorrect = board |> isInBoard(TwoDimensionCoordinate(i, j))
+
         2

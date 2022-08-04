@@ -28,6 +28,34 @@ let coordinates =
         }
     ]
 
+let indexes =
+    testList "Generate index from coordinates tests" [
+        test "0 index should be (x: 0, y: 0)" {
+            let board = Board.newBoard 10 10
+            let coor =  board |> Board.generateCoordinate 0
+            let index = board |> Board.getIndexFromCoordinates coor
+            Expect.equal index 0 "dead cell"
+        }
+        test "1 index should be (x: 1, y: 0)" {
+            let board = Board.newBoard 10 10
+            let coor =  board |> Board.generateCoordinate 1
+            let index = board |> Board.getIndexFromCoordinates coor
+            Expect.equal index 1 "dead cell"
+        }
+        test "10 index should be (x: 0, y: 1)" {
+            let board = Board.newBoard 10 10
+            let coor =  board |> Board.generateCoordinate 10
+            let index = board |> Board.getIndexFromCoordinates coor
+            Expect.equal index 10 "dead cell"
+        }
+        test "21 index should be (x: 1, y: 2)" {
+            let board = Board.newBoard 10 10
+            let coor =  board |> Board.generateCoordinate 21
+            let index = board |> Board.getIndexFromCoordinates coor
+            Expect.equal index 21 "dead cell"
+        }
+    ]
+
 let coordinatesInBoard =
     testList "Generate Coordinates tests" [
         test "(x: 0, y: 0) is in board" {
