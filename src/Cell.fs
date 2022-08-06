@@ -9,7 +9,16 @@ type Cell =
     | Dead
 
 module Cell =
+    open System
 
+    let private r = Random()
+    
+    let random () =
+        if r.Next() % 2 = 0 then
+            Alive
+        else
+            Dead
+        
     let name cell = 
         match cell with 
         | Alive -> "alive"
@@ -31,3 +40,4 @@ module Coordinates =
 
     let isNeighbour coor1 coor2 =
         true
+    
