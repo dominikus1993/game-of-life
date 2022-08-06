@@ -24,7 +24,7 @@ module Cell =
         | Alive -> "alive"
         | Dead -> "dead"
 
-    let updateState neighbours cell =
+    let mapState neighbours cell =
         let aliveCount = neighbours |> Seq.filter(fun n -> match n with | Alive(_) -> true | _ -> false) |> Seq.length
         match cell with
         | Dead when aliveCount = 3 ->

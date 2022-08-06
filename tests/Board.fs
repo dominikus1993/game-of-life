@@ -73,6 +73,15 @@ let neighbours =
         }
     ]
 
+let getCell =
+    testList "Get Cell" [
+        test "(x: 1, y: 2)" {
+            let coord = TwoDimensionCoordinate(1, 2)
+            let subject = Board.newBoard 10 10 |> Board.getCell coord
+            Expect.equal subject.Coordinates  coord "should have 3 neighbours"
+        }
+    ]
+
 let newBoard =
     testList "New Board" [
         test "(height: 10, width: 10)" {
@@ -83,11 +92,11 @@ let newBoard =
             Expect.equal subject.Cells.Length 10 "should have 3 neighbours"
             Expect.equal (subject.Cells.[0].Length) 10 "should have 3 neighbours"
 
-            for (column, cells) in subject.Cells |> Array.indexed do
-                for (row, cell) in cells |> Array.indexed do
+            for (row, cells) in subject.Cells |> Array.indexed do
+                for (column, cell) in cells |> Array.indexed do
                     let ({Coordinates = TwoDimensionCoordinate(x, y)}) = cell
-                    Expect.equal y column "column should equal y"
-                    Expect.equal x row "row should equal x"
+                    Expect.equal x row (sprintf "column: {%d} should equal y: {%d}" row x)
+                    Expect.equal y column "row should equal x"
         }
     ]
 
