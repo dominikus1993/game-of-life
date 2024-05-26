@@ -1,16 +1,60 @@
+using Orleans;
+
 namespace GameOfLife.Core.Cells;
 
-public abstract class Cell
+public enum CellState : byte
 {
-    public abstract bool IsAlive { get; }
+    Dead = 0,
+    Alive = 1
 }
 
-public sealed class AliveCell : Cell
+public readonly record struct Generation(int Value)
 {
-    public override bool IsAlive => true;
+    public Generation Next() => new(Value: Value + 1);
+    
+    public static readonly Generation First = new(0);
 }
 
-public sealed class DeadCell : Cell
+public interface ICellGrain
 {
-    public override bool IsAlive => false;
+    Task<bool> IsAlive(Generation generation);
+    Task AddNeighbours(ICellGrain[] neighbours);
+    
+}
+
+public sealed class Cell : Grain, ICellGrain
+{
+    private Generation _currentGeneration;
+    private ICellGrain[] _neighbours = [];
+    private CellState _currentState;
+    private List<CellState> _stateHistory = [];
+
+    public Cell(CellState cellState)
+    {
+        _currentState = cellState;
+        _stateHistory.Add(cellState);
+        _currentGeneration = Generation.First;
+    }
+    
+    public Task<bool> IsAlive(Generation generation)
+    {
+        if (generation == _currentGeneration)
+        {
+            return Task.FromResult(_currentState == CellState.Alive);
+        }
+
+        if (generation.Value > _currentGeneration.Value)
+        {
+            throw new InvalidOperationException("Cannot check for a future generation");
+        }
+        
+        var state = _stateHistory.ElementAtOrDefault(generation.Value);
+        return Task.FromResult(state == CellState.Alive);
+    }
+
+    public Task AddNeighbours(ICellGrain[] neighbours)
+    {
+        _neighbours = neighbours;
+        return Task.CompletedTask;
+    }
 }
