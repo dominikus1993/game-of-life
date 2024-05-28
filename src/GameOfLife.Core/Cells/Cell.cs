@@ -20,6 +20,8 @@ public interface ICellGrain
     Task<bool> IsAlive(Generation generation);
     Task AddNeighbours(ICellGrain[] neighbours);
     
+    Task<Generation> NextGeneration();
+    
 }
 
 public sealed class Cell : Grain, ICellGrain
@@ -56,5 +58,37 @@ public sealed class Cell : Grain, ICellGrain
     {
         _neighbours = neighbours;
         return Task.CompletedTask;
+    }
+
+    public async Task<Generation> NextGeneration()
+    {
+        if (_neighbours is {Length: 0})
+        {
+            throw new InvalidOperationException("No neighbours found");
+        }
+        
+        var neighboursLifeStatusTasks = _neighbours.Select(async n => await n.IsAlive(_currentGeneration));
+        var neighboursLifeStatus = await Task.WhenAll(neighboursLifeStatusTasks);
+        
+        var aliveNeighbours = neighboursLifeStatus.Count(s => s);
+
+        if (_currentState == CellState.Alive)
+        {
+            if (aliveNeighbours is < 2 or > 3)
+            {
+                _currentState = CellState.Dead;
+            }
+        }
+        else
+        {
+            if (aliveNeighbours == 3)
+            {
+                _currentState = CellState.Alive;
+            }
+        }
+        
+        _currentGeneration = _currentGeneration.Next();
+        _stateHistory.Add(_currentState);
+        return _currentGeneration;
     }
 }
