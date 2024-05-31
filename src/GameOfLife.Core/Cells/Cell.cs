@@ -1,3 +1,4 @@
+using FluentResults;
 using Orleans;
 
 namespace GameOfLife.Core.Cells;
@@ -17,10 +18,10 @@ public readonly record struct Generation(int Value)
 
 public interface ICellGrain
 {
-    Task<bool> IsAlive(Generation generation);
-    Task AddNeighbours(ICellGrain[] neighbours);
+    Task<Result<bool>> IsAlive(Generation generation);
+    Task<Result> AddNeighbours(ICellGrain[] neighbours);
     
-    Task<Generation> NextGeneration();
+    Task<Result<Generation>> NextGeneration();
     
 }
 
@@ -38,39 +39,39 @@ public sealed class Cell : Grain, ICellGrain
         _currentGeneration = Generation.First;
     }
     
-    public Task<bool> IsAlive(Generation generation)
+    public Task<Result<bool>> IsAlive(Generation generation)
     {
         if (generation == _currentGeneration)
         {
-            return Task.FromResult(_currentState == CellState.Alive);
+            return Task.FromResult(Result.Ok(_currentState == CellState.Alive));
         }
 
         if (generation.Value > _currentGeneration.Value)
         {
-            throw new InvalidOperationException("Cannot check for a future generation");
+            return Task.FromResult(Result.Fail<bool>("Cannot check future generations"));
         }
         
         var state = _stateHistory.ElementAtOrDefault(generation.Value);
-        return Task.FromResult(state == CellState.Alive);
+        return Task.FromResult(Result.Ok(state == CellState.Alive));
     }
 
-    public Task AddNeighbours(ICellGrain[] neighbours)
+    public Task<Result> AddNeighbours(ICellGrain[] neighbours)
     {
         _neighbours = neighbours;
-        return Task.CompletedTask;
+        return Task.FromResult(Result.Ok());
     }
 
-    public async Task<Generation> NextGeneration()
+    public async Task<Result<Generation>> NextGeneration()
     {
         if (_neighbours is {Length: 0})
         {
-            throw new InvalidOperationException("No neighbours found");
+            return Result.Fail("No neighbours added");
         }
         
         var neighboursLifeStatusTasks = _neighbours.Select(async n => await n.IsAlive(_currentGeneration));
         var neighboursLifeStatus = await Task.WhenAll(neighboursLifeStatusTasks);
         
-        var aliveNeighbours = neighboursLifeStatus.Count(s => s);
+        var aliveNeighbours = neighboursLifeStatus.Where(x => x.IsSuccess).Count(s => s.Value);
 
         if (_currentState == CellState.Alive)
         {
@@ -89,6 +90,6 @@ public sealed class Cell : Grain, ICellGrain
         
         _currentGeneration = _currentGeneration.Next();
         _stateHistory.Add(_currentState);
-        return _currentGeneration;
+        return Result.Ok(_currentGeneration);
     }
 }

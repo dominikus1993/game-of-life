@@ -16,7 +16,7 @@ public sealed class CellTests
         var state = await cell.IsAlive(Generation.First);
         
         // Assert
-        Assert.False(state);
+        Assert.False(state.Value);
     }
     
     [Fact] 
@@ -29,7 +29,7 @@ public sealed class CellTests
         var state = await cell.IsAlive(Generation.First);
         
         // Assert
-        Assert.True(state);
+        Assert.True(state.Value);
     }
     
     [Fact] 
@@ -39,8 +39,10 @@ public sealed class CellTests
         var cell = new Cell(CellState.Alive);
         
         // Act
-
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await cell.IsAlive(new Generation(10)));
+        var result = await cell.IsAlive(new Generation(10));
+        
+        Assert.True(result.IsFailed);
+        
     }
     
     
@@ -52,7 +54,14 @@ public sealed class CellTests
         
         // Act
         
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await cell.NextGeneration());
+        var result = await cell.IsAlive(new Generation(10));
+        
+        Assert.True(result.IsFailed);
+
+        var genResult = await cell.NextGeneration();
+        
+        // Assert
+        Assert.True(genResult.IsFailed);
     }
     
     [Theory]
@@ -72,9 +81,12 @@ public sealed class CellTests
         
         // Assert
 
-        var expectedState = await cell.IsAlive(gen);
+        var expectedState = await cell.IsAlive(gen.Value);
+        var firstState = await cell.IsAlive(Generation.First);
         
-        Assert.Equal(shouldSurvive, expectedState);
+        Assert.True(firstState.IsSuccess);
+        Assert.True(firstState.Value);
+        Assert.Equal(shouldSurvive, expectedState.Value);
     }
     
     [Fact]
@@ -84,8 +96,10 @@ public sealed class CellTests
         var cell = new Cell(CellState.Dead);
         
         // Act
+        var result = await cell.NextGeneration();
         
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await cell.NextGeneration());
+        // Assert
+        Assert.True(result.IsFailed);
     }
     
     [Theory]
@@ -97,7 +111,8 @@ public sealed class CellTests
     public async Task TestNextGenerationOfDeadCellWithNAliveNeighbours(int nAliveNeighbours, bool shouldBeAlive)
     {
         // Arrange
-        var cell = new Cell(CellState.Dead);
+        var firstState = CellState.Dead;
+        var cell = new Cell(firstState);
         await cell.AddNeighbours(Enumerable.Range(0, nAliveNeighbours).Select(x => new Cell(CellState.Alive)).ToArray());
         // Act
 
@@ -105,8 +120,11 @@ public sealed class CellTests
         
         // Assert
 
-        var expectedState = await cell.IsAlive(gen);
+        var expectedState = await cell.IsAlive(gen.Value);
+        var lastState = await cell.IsAlive(Generation.First);
         
-        Assert.Equal(shouldBeAlive, expectedState);
+        Assert.True(lastState.IsSuccess);
+        Assert.False(lastState.Value);
+        Assert.Equal(shouldBeAlive, expectedState.Value);
     }
 }

@@ -1,5 +1,6 @@
 <Project>
   <ItemGroup>
+    <PackageVersion Include="FluentResults" Version="3.15.2" />
     <PackageVersion Include="Microsoft.Orleans.Core" Version="8.1.0" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="8.48.0.56517">
       <PrivateAssets>all</PrivateAssets>
