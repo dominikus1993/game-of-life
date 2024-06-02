@@ -13,17 +13,22 @@ public readonly record struct Generation(int Value)
 {
     public Generation Next() => new(Value: Value + 1);
     
-    public static readonly Generation First = new(0);
+    public static readonly Generation Zero = new(0);
+    public static readonly Generation First = new(1);
 }
 
-public interface ICellGrain
+public interface ICellGrain : IGrainWithIntegerKey
 {
     Task<Result<bool>> IsAlive(Generation generation);
+    Task<Result> SetCellState(CellState state);
     Task<Result> AddNeighbours(ICellGrain[] neighbours);
     
     Task<Result<Generation>> NextGeneration();
+    Task<Result<Generation>> GetCurrentGeneration();
     
 }
+
+public sealed record CellStateData(CellState LifeStatus);
 
 public sealed class Cell : Grain, ICellGrain
 {
@@ -31,12 +36,10 @@ public sealed class Cell : Grain, ICellGrain
     private ICellGrain[] _neighbours = [];
     private CellState _currentState;
     private List<CellState> _stateHistory = [];
-
-    public Cell(CellState cellState)
+  
+    public Cell()
     {
-        _currentState = cellState;
-        _stateHistory.Add(cellState);
-        _currentGeneration = Generation.First;
+        _currentGeneration = Generation.Zero;
     }
     
     public Task<Result<bool>> IsAlive(Generation generation)
@@ -53,6 +56,14 @@ public sealed class Cell : Grain, ICellGrain
         
         var state = _stateHistory.ElementAtOrDefault(generation.Value);
         return Task.FromResult(Result.Ok(state == CellState.Alive));
+    }
+
+    public Task<Result> SetCellState(CellState state)
+    {
+        _currentState = state;
+        _stateHistory.Add(state);
+        _currentGeneration = _currentGeneration.Next();
+        return Task.FromResult(Result.Ok());
     }
 
     public Task<Result> AddNeighbours(ICellGrain[] neighbours)
@@ -91,5 +102,10 @@ public sealed class Cell : Grain, ICellGrain
         _currentGeneration = _currentGeneration.Next();
         _stateHistory.Add(_currentState);
         return Result.Ok(_currentGeneration);
+    }
+
+    public Task<Result<Generation>> GetCurrentGeneration()
+    {
+        return Task.FromResult(Result.Ok(_currentGeneration));
     }
 }

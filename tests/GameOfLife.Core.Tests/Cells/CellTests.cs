@@ -4,16 +4,17 @@ namespace GameOfLife.Core.Tests.Cells;
 
 public sealed class CellTests
 {
-
-
+    
     [Fact] 
     public async Task Cell__WithDeadState_IsActive_ShouldBeFalse()
     {
         // Arrange
-        var cell = new Cell(CellState.Dead);
+        var cell = new Cell();
+        await cell.SetCellState(CellState.Alive);
+        var currentGen = await cell.GetCurrentGeneration();
         
         // Act
-        var state = await cell.IsAlive(Generation.First);
+        var state = await cell.IsAlive(currentGen.Value);
         
         // Assert
         Assert.False(state.Value);
@@ -23,10 +24,11 @@ public sealed class CellTests
     public async Task Cell__WithAliveState_IsActive_ShouldBeFalse()
     {
         // Arrange
-        var cell = new Cell(CellState.Alive);
-        
+        var cell = new Cell();
+        await cell.SetCellState(CellState.Alive);
+        var currentGen = await cell.GetCurrentGeneration();
         // Act
-        var state = await cell.IsAlive(Generation.First);
+        var state = await cell.IsAlive(currentGen.Value);
         
         // Assert
         Assert.True(state.Value);
@@ -36,7 +38,8 @@ public sealed class CellTests
     public async Task Cell__WithAliveState_IsActive_InFutureGen_ShouldThrowException()
     {
         // Arrange
-        var cell = new Cell(CellState.Alive);
+        var cell = new Cell();
+        await cell.SetCellState(CellState.Alive);
         
         // Act
         var result = await cell.IsAlive(new Generation(10));
@@ -50,7 +53,8 @@ public sealed class CellTests
     public async Task TestNextGenerationOfAliveCellWithNoNeighbours()
     {
         // Arrange
-        var cell = new Cell(CellState.Alive);
+        var cell = new Cell();
+        await cell.SetCellState(CellState.Alive);
         
         // Act
         
@@ -73,8 +77,16 @@ public sealed class CellTests
     public async Task TestNextGenerationOfAliveCellWithNAliveNeighbours(int nAliveNeighbours, bool shouldSurvive)
     {
         // Arrange
-        var cell = new Cell(CellState.Alive);
-        await cell.AddNeighbours(Enumerable.Range(0, nAliveNeighbours).Select(x => new Cell(CellState.Alive)).ToArray());
+        var cell = new Cell();
+        await cell.SetCellState(CellState.Alive);
+        var ts = Enumerable.Range(0, nAliveNeighbours).Select(async x =>
+        {
+            var c = new Cell();
+            await c.SetCellState(CellState.Alive);
+            return c;
+        });
+        var cells = await Task.WhenAll(ts);
+        await cell.AddNeighbours(cells);
         // Act
 
         var gen = await cell.NextGeneration();
@@ -93,7 +105,8 @@ public sealed class CellTests
     public async Task TestNextGenerationOfDeadWithNoNeighbours()
     {
         // Arrange
-        var cell = new Cell(CellState.Dead);
+        var cell = new Cell();
+        await cell.SetCellState(CellState.Dead);
         
         // Act
         var result = await cell.NextGeneration();
@@ -112,8 +125,16 @@ public sealed class CellTests
     {
         // Arrange
         var firstState = CellState.Dead;
-        var cell = new Cell(firstState);
-        await cell.AddNeighbours(Enumerable.Range(0, nAliveNeighbours).Select(x => new Cell(CellState.Alive)).ToArray());
+        var cell = new Cell();
+        await cell.SetCellState(firstState);
+        var ts = Enumerable.Range(0, nAliveNeighbours).Select(async x =>
+        {
+            var cell = new Cell();
+            await cell.SetCellState(CellState.Alive);
+            return cell;
+        });
+        var cells = await Task.WhenAll(ts);
+        await cell.AddNeighbours(cells);
         // Act
 
         var gen = await cell.NextGeneration();
