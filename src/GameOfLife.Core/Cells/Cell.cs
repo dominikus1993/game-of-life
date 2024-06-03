@@ -17,7 +17,7 @@ public readonly record struct Generation(int Value)
     public static readonly Generation First = new(1);
 }
 
-public interface ICellGrain : IGrainWithIntegerKey
+public interface ICellGrain : IGrainWithGuidKey
 {
     Task<Result<bool>> IsAlive(Generation generation);
     Task<Result> SetCellState(CellState state);
