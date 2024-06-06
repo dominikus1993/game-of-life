@@ -1,5 +1,7 @@
 <Project>
   <ItemGroup>
+    <PackageVersion Include="Akka" Version="1.5.23" />
+    <PackageVersion Include="Akka.Hosting" Version="1.5.22" />
     <PackageVersion Include="FluentResults" Version="3.15.2" />
     <PackageVersion Include="Microsoft.Orleans.Core" Version="8.1.0" />
     <PackageVersion Include="Microsoft.Orleans.TestingHost" Version="8.1.0" />

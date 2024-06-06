@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Akka" />
+    <PackageReference Include="Akka.Hosting" />
     <PackageReference Include="FluentResults" />
     <PackageReference Include="Microsoft.Orleans.Core" />
   </ItemGroup>
