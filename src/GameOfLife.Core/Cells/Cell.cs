@@ -18,21 +18,27 @@ public readonly record struct Generation(int Value)
     public static readonly Generation First = new(1);
 }
 
+public sealed record CheckNextGenerations(Generation Generation);
+public sealed record CheckNextGenerationsResponse(Coordinate Coordinate, Generation Generation, CellState State);
+public sealed record CheckNextGenerationsFailedResponse(string Error);
+
 public sealed record CheckCellState(Generation Generation);
 
 public sealed record CheckCellStateResponse(Coordinate Coordinate, Generation Generation, CellState State);
 public sealed record CheckCellStateFailedResponse(string Error);
 
-public sealed record CellStateData(CellState LifeStatus);
-
+public sealed record AddNeighbours(IActorRef[] Neighbours);
+public sealed record NeighboursAdded(Coordinate Coordinate);
 public sealed record Coordinate(uint X, uint Y);
 public sealed class CellActor : UntypedActor
 {
     private Generation _currentGeneration;
     private IActorRef[] _neighbours = [];
+    private List<CheckCellStateResponse> _neighboursStateResponses = [];
     private readonly Coordinate _coordinate;
     private CellState _currentState;
     private List<CellState> _stateHistory = [];
+    private IActorRef? _currentCheckSender;
   
     public CellActor(Coordinate coordinate, CellState initialState)
     {
@@ -46,12 +52,52 @@ public sealed class CellActor : UntypedActor
     {
         switch (message)
         {
+            case CheckNextGenerations msg:
+                CheckCellNextGenerations(msg);
+                return;
             case Cells.CheckCellState msg:
                 CheckCellState(msg);
                 return;
+            case CheckCellStateResponse msg:
+                ProcessCheckCellStateResponse(msg);
+                return;
+            case AddNeighbours msg:
+                AddCellNeighbours(msg);
+                return;
         }
     }
-    
+
+    private void ProcessCheckCellStateResponse(CheckCellStateResponse msg)
+    {
+        _neighboursStateResponses.Add(msg);
+        if (_neighboursStateResponses.Count == _neighbours.Length)
+        {
+            _currentCheckSender?.Tell(new CheckNextGenerationsResponse(_coordinate, _currentGeneration, _currentState));
+            _currentCheckSender = null;
+        }
+    }
+
+    private void CheckCellNextGenerations(CheckNextGenerations msg)
+    {
+        if (_currentCheckSender is not null)
+        {
+            Sender.Tell(new CheckCellStateFailedResponse("Already checking"));
+            return;
+        }
+        
+        _currentCheckSender = Sender;
+        foreach (var neighbour in _neighbours)
+        {
+            neighbour.Tell(new Cells.CheckCellState(_currentGeneration));
+        }
+    }
+
+    private void AddCellNeighbours(AddNeighbours msg)
+    {
+        _neighbours = msg.Neighbours;
+        Sender.Tell(new NeighboursAdded(_coordinate));
+    }
+
     private void CheckCellState(Cells.CheckCellState msg)
     {
         var generation = msg.Generation;
