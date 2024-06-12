@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using Akka.Actor;
 using FluentResults;
 using Orleans;
@@ -72,6 +73,25 @@ public sealed class CellActor : UntypedActor
         _neighboursStateResponses.Add(msg);
         if (_neighboursStateResponses.Count == _neighbours.Length)
         {
+            _currentGeneration = _currentGeneration.Next();
+            _stateHistory.Add(_currentState);
+            var aliveNeighbours = _neighboursStateResponses.Count(r => r.State == CellState.Alive);
+            
+            if (_currentState == CellState.Alive)
+            {
+                if (aliveNeighbours is < 2 or > 3)
+                {
+                    _currentState = CellState.Dead;
+                }
+            }
+            else
+            {
+                if (aliveNeighbours == 3)
+                {
+                    _currentState = CellState.Alive;
+                }
+            }
+
             _currentCheckSender?.Tell(new CheckNextGenerationsResponse(_coordinate, _currentGeneration, _currentState));
             _currentCheckSender = null;
         }
@@ -84,11 +104,17 @@ public sealed class CellActor : UntypedActor
             Sender.Tell(new CheckCellStateFailedResponse("Already checking"));
             return;
         }
+
+        if (_currentGeneration.Value > msg.Generation.Value)
+        {
+            Sender.Tell(new CheckCellStateFailedResponse("Generation not reached"));
+            return;
+        }
         
         _currentCheckSender = Sender;
         foreach (var neighbour in _neighbours)
         {
-            neighbour.Tell(new Cells.CheckCellState(_currentGeneration));
+            neighbour.Tell(new Cells.CheckCellState(msg.Generation));
         }
     }
 
