@@ -26,7 +26,13 @@ public sealed record CheckNextGenerationsFailedResponse(string Error);
 public sealed record CheckCellState(Generation Generation);
 
 public sealed record CheckCellStateResponse(Coordinate Coordinate, Generation Generation, CellState State);
-public sealed record CheckCellStateFailedResponse(string Error);
+
+public sealed record CheckCellStateFailedResponse(string Error)
+{
+    public static readonly CheckCellStateFailedResponse GenerationNotReached = new("Generation not reached");
+    public static readonly CheckCellStateFailedResponse AlreadyChecking = new("Already checking");
+    public static readonly CheckCellStateFailedResponse NoNeighbours = new("No neighbours");
+}
 
 public sealed record AddNeighbours(IActorRef[] Neighbours);
 public sealed record NeighboursAdded(Coordinate Coordinate);
@@ -73,8 +79,6 @@ public sealed class CellActor : UntypedActor
         _neighboursStateResponses.Add(msg);
         if (_neighboursStateResponses.Count == _neighbours.Length)
         {
-            _currentGeneration = _currentGeneration.Next();
-            _stateHistory.Add(_currentState);
             var aliveNeighbours = _neighboursStateResponses.Count(r => r.State == CellState.Alive);
             
             if (_currentState == CellState.Alive)
@@ -92,6 +96,8 @@ public sealed class CellActor : UntypedActor
                 }
             }
 
+            _currentGeneration = _currentGeneration.Next();
+            _stateHistory.Add(_currentState);
             _currentCheckSender?.Tell(new CheckNextGenerationsResponse(_coordinate, _currentGeneration, _currentState));
             _currentCheckSender = null;
         }
@@ -108,6 +114,12 @@ public sealed class CellActor : UntypedActor
         if (_currentGeneration.Value > msg.Generation.Value)
         {
             Sender.Tell(new CheckCellStateFailedResponse("Generation not reached"));
+            return;
+        }
+
+        if (_neighbours is {Length: 0})
+        {
+            Sender.Tell(CheckCellStateFailedResponse.NoNeighbours);
             return;
         }
         
@@ -141,4 +153,6 @@ public sealed class CellActor : UntypedActor
         var state = _stateHistory.ElementAtOrDefault(generation.Value);
         Sender.Tell(new Cells.CheckCellStateResponse(_coordinate, generation, state));
     }
+    
+    public static Props Props(Coordinate coordinate, CellState initialState) => Akka.Actor.Props.Create(() => new CellActor(coordinate, initialState));
 }

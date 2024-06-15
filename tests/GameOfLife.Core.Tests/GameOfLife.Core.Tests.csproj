@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Akka.TestKit.Xunit2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk"  />
     <PackageReference Include="Microsoft.Orleans.TestingHost" />
     <PackageReference Include="xunit" />
