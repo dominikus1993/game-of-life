@@ -1,37 +1,69 @@
-// using System.Security.Cryptography;
-// using Akka.Actor;
-// using FluentResults;
-// using GameOfLife.Core.Cells;
-// using GameOfLife.Core.Services;
-// using GameOfLife.Core.Types;
-// using Orleans;
-//
-// namespace GameOfLife.Core;
-//
-// public interface IBoardGrain : IGrain
-// {
-//     Task<Result> Initialize(int size);
-// }
-//
-// public sealed class Board : Grain, IBoardGrain
-// {
-//     private readonly IActorRef[,] _cells;
-//
-//     public Board(ICellInitialStateDecider initialStateDecider, int size = 10)
-//     {
-//         // _cells = new Cell[size, size];
-//         // for (uint x = 0; x < size; x++)
-//         // {
-//         //     for (uint y = 0; y < size; y++)
-//         //     {
-//         //         _cells[x, y] = initialStateDecider.GetInitialCellState(new Coordinate(x, y));
-//         //     }
-//         // }
-//     }
-//
-//
-//     public Task<Result> Initialize(int size)
-//     {
-//         throw new NotImplementedException();
-//     }
-// }
+using System.Security.Cryptography;
+using Akka.Actor;
+using GameOfLife.Core.Cells;
+
+namespace GameOfLife.Core;
+
+public interface IDisplay
+{
+    void Render();
+}
+
+public sealed class Board : UntypedActor
+{
+    private readonly Dictionary<Coordinate, IActorRef> _cells = new Dictionary<Coordinate, IActorRef>();
+    private readonly int _size;
+    public Board(int size = 10)
+    {
+        _size = size;
+    }
+
+    protected override void PreStart()
+    {
+
+        for (int i = 0; i < _size; i++)
+        {
+            for (int j = 0; j < _size; j++)
+            {
+                var coord = new Coordinate(i, j);
+                var state = RandomNumberGenerator.GetInt32(0, 3) == 1 ? CellState.Alive : CellState.Dead;
+                var cell = Context.ActorOf(CellActor.Props(coord, state), CellName(coord));
+                _cells.Add(coord, cell);
+            }
+        }
+
+        foreach (var cell in _cells)
+        {
+            var neighbourCoordinates = GetNeighbours(cell.Key);
+            var neighbours = neighbourCoordinates.Select(c => _cells.TryGetValue(c, out var cellActor) ? cellActor : null).OfType<IActorRef>().ToArray();
+            cell.Value.Tell(new AddNeighbours(neighbours));
+        }
+        
+        base.PreStart();
+    }
+
+    private Coordinate[] GetNeighbours(Coordinate coord)
+    {
+        Coordinate[] potentialNeighbours = [
+            new Coordinate(coord.X - 1, coord.Y - 1),
+            new Coordinate(coord.X - 1, coord.Y),
+            new Coordinate(coord.X - 1, coord.Y + 1),
+            new Coordinate(coord.X, coord.Y - 1),
+            new Coordinate(coord.X, coord.Y + 1),
+            new Coordinate(coord.X + 1, coord.Y - 1),
+            new Coordinate(coord.X + 1, coord.Y),
+            new Coordinate(coord.X + 1, coord.Y + 1)
+        ];
+        
+        return potentialNeighbours.Where(c => c.IsValidCoordinate(_size)).ToArray();
+    }
+
+    private static string CellName(Coordinate coord) => $"cell_{coord.X}_{coord.Y}";
+
+    protected override void OnReceive(object message)
+    {
+        
+    }
+    
+    public static Props Props(int size = 10) => Akka.Actor.Props.Create(() => new Board(size));
+}

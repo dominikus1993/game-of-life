@@ -36,7 +36,24 @@ public sealed record CheckCellStateFailedResponse(string Error)
 
 public sealed record AddNeighbours(IActorRef[] Neighbours);
 public sealed record NeighboursAdded(Coordinate Coordinate);
-public sealed record Coordinate(uint X, uint Y);
+
+public sealed record Coordinate(int X, int Y)
+{
+    public bool IsValidCoordinate(int size)
+    {
+        if (X < 0 || Y < 0)
+        {
+            return false;
+        }
+
+        if (X >= size || Y >= size)
+        {
+            return false;
+        }
+        
+        return true;
+    }
+}
 public sealed class CellActor : UntypedActor
 {
     private Generation _currentGeneration;
