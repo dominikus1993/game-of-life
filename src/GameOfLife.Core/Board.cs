@@ -9,9 +9,16 @@ public interface IDisplay
     void Render();
 }
 
+public sealed record Next();
+
 public sealed class Board : UntypedActor
 {
     private readonly Dictionary<Coordinate, IActorRef> _cells = new Dictionary<Coordinate, IActorRef>();
+    private IActorRef _displayActor;
+    private IActorRef _gameActor;
+    private Generation _currentGeneration = Generation.Zero;
+    private bool _isChecking = false;
+    
     private readonly int _size;
     public Board(int size = 10)
     {
@@ -59,11 +66,33 @@ public sealed class Board : UntypedActor
     }
 
     private static string CellName(Coordinate coord) => $"cell_{coord.X}_{coord.Y}";
-
-    protected override void OnReceive(object message)
-    {
-        
-    }
+    
     
     public static Props Props(int size = 10) => Akka.Actor.Props.Create(() => new Board(size));
+    protected override void OnReceive(object message)
+    {
+        switch (message)
+        {
+            case Next msg:
+                CheckNextGenerationsHandler(msg);
+                break;
+            case CheckNextGenerationsResponse msg:
+                _displayActor.Tell(msg);
+                break;
+        }
+    }
+
+    private void CheckNextGenerationsHandler(Next msg)
+    {
+        if (_isChecking)
+        {
+            return;
+        }
+
+        _isChecking = true;
+        foreach (var cell in _cells)
+        {
+            cell.Value.Tell(new CheckNextGenerations(_currentGeneration));
+        }
+    }
 }
