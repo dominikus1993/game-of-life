@@ -16,6 +16,21 @@ public interface ICellStateDeterminer
     CellState DetermineState();
 }
 
+public sealed class RandomCellStateDeterminer : ICellStateDeterminer
+{
+    private readonly Random _random;
+
+    public RandomCellStateDeterminer(Random random)
+    {
+        _random = random;
+    }
+
+    public CellState DetermineState()
+    {
+        return _random.Next(0, 2) == 0 ? CellState.Dead : CellState.Alive;
+    }
+}
+
 public sealed class CellFactory : ICellFactory
 {
     private readonly INeighborFinder _neighborFinder;

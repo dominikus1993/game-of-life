@@ -23,4 +23,9 @@ public sealed class Cell
     {
         return new Cell(location, state);
     }
+    
+    public void UpdateState(ICellStateUpdater cellStateUpdater)
+    {
+        State = cellStateUpdater.UpdateState(State, Neighbors);
+    }
 }

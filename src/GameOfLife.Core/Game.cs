@@ -1,35 +1,51 @@
+using GameOfLife.Core.Cells;
+
 namespace GameOfLife.Core;
 
-public class Game
+public sealed class Game
 {
-    public async ValueTask Run(CancellationToken cancellationToken)
+    private readonly int _width;
+    private readonly int _height;
+    private readonly ICellFactory _factory;
+    private readonly ICellStateUpdater _updater;
+
+    public Game(int width, int height, ICellFactory factory, ICellStateUpdater updater)
     {
-        await Initialize();
+        _width = width;
+        _height = height;
+        _factory = factory;
+        _updater = updater;
+    }
+    
+    public ValueTask Run(CancellationToken cancellationToken)
+    {
+        var board = Initialize();
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Input();
-            await Update();
-            await Render();
+            Input(board);
+            Update(board);
+            Render(board);
         }
+        
+        return ValueTask.CompletedTask;
     }
 
-    private ValueTask Input()
+    private void Input(Board board)
     {
-        return ValueTask.CompletedTask;
     }
     
-    private ValueTask Update()
+    private void Update(Board board)
     {
-        return ValueTask.CompletedTask;
+        board.NextGeneration(_updater);
     }
     
-    private ValueTask Render()
+    private void Render(Board board)
     {
-        return ValueTask.CompletedTask;
+        
     }
     
-    private ValueTask Initialize()
+    private Board Initialize()
     {
-        return ValueTask.CompletedTask;
+        return Board.InitializeState(_width, _height, _factory);
     }
 }
