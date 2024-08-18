@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using GameOfLife.Core.Cells;
 
 namespace GameOfLife.Core;
@@ -5,15 +6,16 @@ namespace GameOfLife.Core;
 
 public sealed class Board
 {
-    private List<Cell> Cells { get; }
+    private IReadOnlyList<Cell> Cells { get; }
 
-    private Board(List<Cell> cells)
+    private Board(IReadOnlyList<Cell> cells)
     {
         Cells = cells;
     }
     
-    public static Board InitializeState()
+    public Board InitializeState(int width, int height, ICellFactory factory)
     {
-        return new Board([]);
+        var cells = factory.CreateCells(width, height);
+        return new Board(cells);
     }
 }
