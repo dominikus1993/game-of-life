@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using GameOfLife.Core.Abstraction;
 using GameOfLife.Core.Cells;
 
 namespace GameOfLife.Core;
@@ -7,11 +8,12 @@ namespace GameOfLife.Core;
 public sealed class Board
 {
     private IReadOnlyList<Cell> Cells { get; }
-    private int Generation { get; set; } = 0;
+    private int Generation { get; set; }
 
     private Board(IReadOnlyList<Cell> cells)
     {
         Cells = cells;
+        Generation = 0;
     }
     
     public static Board InitializeState(int width, int height, ICellFactory factory)
@@ -27,5 +29,11 @@ public sealed class Board
         {
             cell.UpdateState(updater);
         }
+        Generation += 1;
+    }
+    
+    public ValueTask Render(IBoardRenderer renderer)
+    {
+        return renderer.RenderBoard(Cells, Generation);
     }
 }
