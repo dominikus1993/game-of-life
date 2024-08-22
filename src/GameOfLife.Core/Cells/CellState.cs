@@ -16,17 +16,7 @@ public abstract class CellState
         Name = name;
     }
     
-    public sealed class AliveState : CellState
-    {
-        public AliveState() : base(1, nameof(Alive))
-        {
-        }
-    }
+    public sealed class AliveState() : CellState(1, nameof(Alive));
 
-    public sealed class DeadState : CellState
-    {
-        public DeadState() : base(0, nameof(Dead))
-        {
-        }
-    }
+    public sealed class DeadState() : CellState(0, nameof(Dead));
 }
