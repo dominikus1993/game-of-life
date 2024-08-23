@@ -8,7 +8,7 @@ public interface ICellFactory
 
 public interface INeighborFinder
 {
-    IReadOnlyList<Cell> FindNeighbors(Cell cell, IReadOnlyList<Cell> cells);
+    IReadOnlyList<Cell> FindNeighbors(Cell cell, IReadOnlyDictionary<Location, Cell> cells);
 }
 
 public interface ICellStateDeterminer
@@ -61,28 +61,27 @@ public sealed class CellFactory : ICellFactory
             }
         }
 
-        foreach (var cell in cells)
+        var dict = cells.ToDictionary(x => x.Location);
+        foreach (var cell in dict.Values)
         {
-            var neighbors = _neighborFinder.FindNeighbors(cell, cells);
+            var neighbors = _neighborFinder.FindNeighbors(cell, dict);
             cell.AddNeighbors(neighbors);
         }
 
-        return cells;
+        return dict.Values.ToArray();
     }
 }
 
 public sealed class NeighborFinder : INeighborFinder
 {
-    public IReadOnlyList<Cell> FindNeighbors(Cell cell, IReadOnlyList<Cell> cells)
+    public IReadOnlyList<Cell> FindNeighbors(Cell cell, IReadOnlyDictionary<Location, Cell> cells)
     {
-
         if (cells is {Count: 0})
         {
             return [];
         }
         
-        var (maxX, maxY) = cells.Max(c => c.Location);
-        var dict = cells.ToDictionary(c => c.Location);
+        var (maxX, maxY) = cells.Keys.Max(c => c);
         var (x, y) = cell.Location;
         Location[] potentialNeighbours = [new Location(x + 1, y), new Location(x - 1, y), new Location(x, y + 1), new Location(x, y - 1), new Location(x + 1, y + 1), new Location(x - 1, y - 1), new Location(x + 1, y - 1), new Location(x - 1, y + 1)];
         Location[] validNeighbours = potentialNeighbours.Where(location => location.X >= 0 && location.X <= maxX && location.Y >= 0 && location.Y <= maxY).ToArray();
@@ -95,7 +94,7 @@ public sealed class NeighborFinder : INeighborFinder
         var neighbors = new List<Cell>(validNeighbours.Length);
         foreach (var location in validNeighbours.AsSpan())
         {
-            if (dict.TryGetValue(location, out var neighbor))
+            if (cells.TryGetValue(location, out var neighbor))
             {
                 neighbors.Add(neighbor);
             }

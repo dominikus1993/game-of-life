@@ -3,13 +3,14 @@ using GameOfLife.Core.Cells;
 
 namespace GameOfLife.Core;
 
-public sealed class Game
+public sealed class Game : IDisposable
 {
     private readonly int _width;
     private readonly int _height;
     private readonly ICellFactory _factory;
     private readonly ICellStateUpdater _updater;
     private readonly IBoardRenderer _boardRenderer;
+    private IDisposable _subscription;
 
     public Game(int width, int height, ICellFactory factory, ICellStateUpdater updater, IBoardRenderer boardRenderer)
     {
@@ -44,11 +45,20 @@ public sealed class Game
     
     private async ValueTask Render(Board board)
     {
-        await board.Render(_boardRenderer);
+        await _boardRenderer.RenderBoard();
     }
     
     private Board Initialize()
     {
-        return Board.InitializeState(_width, _height, _factory);
+        var res = Board.InitializeState(new BoardSize(_width, _height), _factory);
+
+        _subscription = res.Subscribe(_boardRenderer);
+
+        return res;
+    }
+
+    public void Dispose()
+    {
+        _subscription.Dispose();
     }
 }

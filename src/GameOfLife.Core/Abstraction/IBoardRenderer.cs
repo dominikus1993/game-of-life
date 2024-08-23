@@ -2,26 +2,43 @@ using GameOfLife.Core.Cells;
 
 namespace GameOfLife.Core.Abstraction;
 
-public interface IBoardRenderer
+public interface IBoardRenderer : IObserver<BoardState>
 {
-    ValueTask RenderBoard(IReadOnlyList<Cell> cells, int generation);
+    ValueTask RenderBoard();
 }
 
 public sealed class ConsoleBoardRenderer : IBoardRenderer
 {
-    public ValueTask RenderBoard(IReadOnlyList<Cell> cells, int generation)
+    private BoardState _state = BoardState.Empty;
+    
+    public ValueTask RenderBoard()
     {
         Console.Clear();
-        Console.WriteLine($"Generation: {generation}");
-        for (var i = 0; i < cells.Count; i++)
+        Console.WriteLine($"Generation: {_state.Generation}");
+        for (var i = 0; i < _state.Cells.Count; i++)
         {
-            if (i % 100 == 0)
+            if (i % _state.Size.Width == 0)
             {
                 Console.WriteLine();
             }
-            Console.Write(cells[i].State == CellState.Alive ? "X" : " ");
+            Console.Write(_state.Cells[i].State == CellState.Alive ? "X" : " ");
         }
         Console.WriteLine();
         return ValueTask.CompletedTask;
+    }
+
+    public void OnCompleted()
+    {
+        Console.WriteLine("Game Over");
+    }
+
+    public void OnError(Exception error)
+    {
+        Console.WriteLine("Error");
+    }
+
+    public void OnNext(BoardState value)
+    {
+        _state = value;
     }
 }

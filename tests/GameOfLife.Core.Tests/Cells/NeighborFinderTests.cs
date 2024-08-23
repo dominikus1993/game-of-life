@@ -20,7 +20,7 @@ public class NeighborFinderTests
         
         
         // Act
-        var result = finder.FindNeighbors(cell, neighbors);
+        var result = finder.FindNeighbors(cell, neighbors.ToDictionary(x => x.Location));
         
         // Assert
         
@@ -47,7 +47,7 @@ public class NeighborFinderTests
         
         
         // Act
-        var result = finder.FindNeighbors(cell, neighbors);
+        var result = finder.FindNeighbors(cell, neighbors.ToDictionary(x => x.Location));
         
         // Assert
         
@@ -66,7 +66,7 @@ public class NeighborFinderTests
         
         
         // Act
-        var result = finder.FindNeighbors(cell, []);
+        var result = finder.FindNeighbors(cell, new Dictionary<Location, Cell>());
         
         // Assert
         

@@ -17,7 +17,7 @@ var determimenr = new RandomCellStateDeterminer(Random.Shared);
 var renderer = new ConsoleBoardRenderer();
 var factory = new CellFactory(neighbourFinder, determimenr);
 
-var game = new Game(100, 100, factory, updater, renderer);
+using var game = new Game(100, 100, factory, updater, renderer);
 
 await game.Run(cancellationTokenSource.Token);
 
