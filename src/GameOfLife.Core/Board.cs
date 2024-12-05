@@ -72,7 +72,7 @@ public sealed class Board : IObservable<BoardState>
     private sealed class Unsubscriber : IDisposable
     {
         private readonly List<IObserver<BoardState>>_observers;
-        private readonly IObserver<BoardState> _observer;
+        private readonly IObserver<BoardState>? _observer;
 
         public Unsubscriber(List<IObserver<BoardState>> observers, IObserver<BoardState> observer)
         {

@@ -21,7 +21,7 @@ public sealed class Game : IDisposable
         _boardRenderer = boardRenderer;
     }
     
-    public async ValueTask Run(CancellationToken cancellationToken)
+    public async ValueTask  Run(CancellationToken cancellationToken)
     {
         var board = Initialize();
         while (!cancellationToken.IsCancellationRequested)

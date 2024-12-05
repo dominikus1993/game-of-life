@@ -1,3 +1,5 @@
+using Akka.Actor;
+
 namespace GameOfLife.Core.Cells;
 
 public sealed class Cell
@@ -28,4 +30,22 @@ public sealed class Cell
     {
         State = cellStateUpdater.UpdateState(State, Neighbors);
     }
+}
+
+public sealed class AddNeighboursMessage
+{
+    public IReadOnlyList<IActorRef> Neighbors { get; }
+
+    public AddNeighboursMessage(IReadOnlyList<IActorRef> neighbors)
+    {
+        Neighbors = neighbors;
+    }
+}
+
+public sealed class CellActor : ReceiveActor
+{
+    private uint _generation = 0;
+    private Cell _state;
+    private IReadOnlyList<IActorRef> _neighbors = [];
+    
 }
